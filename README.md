@@ -5,13 +5,13 @@
 **Ime teme:** Uno
 
 
-**Kratak opis teme:** Simulacija igre Uno izmedju èetiri igraèa.
+**Kratak opis teme:** Simulacija igre Uno izmeÄ‘u Äetiri igraÄa.
 
 
 **Planirani jezik:** C++
 
 
-**Pokretanje:** Kod se kompilira C++ kompilatorom g++. Izvršni fajl se pokreæe iz terminala.
+**Pokretanje:** Kod se kompilira C++ kompilatorom g++. IzvrÅ¡ni fajl se pokreÄ‡e iz terminala.
 
 
 **Operativni sistem:** Linux / Windows
@@ -19,6 +19,6 @@
 
 **Autori:**
 
-- Aleksa Trboviæ,  217/2017 aleksa.trbovic@gmail.com
+- Aleksa TrboviÄ‡,  217/2017 aleksa.trbovic@gmail.com
 
-- Robert Doa,  33/2017 robertdoza98@gmail.com
+- Robert DoÅ¾a,  33/2017 robertdoza98@gmail.com
