@@ -4,82 +4,84 @@
 #include "karta.h"
 #include "spil.h"
 #include <algorithm>
+#include <sstream>
 
 namespace Ig{
 
 class Igrac{
 public:
-
-
-	Igrac()
-	{
+	Igrac() {
 
 	}	
 
-
-	void vuci(kar::Karta k)
-	{
+	//Metod koji postavlja kartu u ruku igraca
+	void vuci(kar::Karta k) {
 		ruka.push_back(k);
-
 	}	
 
-
-	kar::Karta izbaci(int i)
-	{
+	/*Metod koji iz ruke igraca izbacuje jednu kartu
+	 *Poziv simulira odvajanje jedne karte iz ruke kako bi se razmotrilo
+	 *njeno eventualno izbacivanje.
+	 */
+	kar::Karta izbaci(int i) {
 		kar::Karta tmp(ruka[i]);
 		std::vector<kar::Karta>::iterator it=ruka.end();
 		ruka[i]=*(it-1);
 		ruka.pop_back();
 		return tmp;
-
 	}
 
-
-	int broj_karata()
-	{
+	//Metod koji vraca broj karata u ruci
+	int broj_karata() {
 		return ruka.size(); 
 	}
 
-
-	void sortiraj_ruku()
-	{
+	//Metodi za sortiranje karata u ruci
+	void sortiraj_ruku() {
 		std::sort(ruka.begin(),ruka.end(),kar::compare);
 	}
 
-
-	void sortiraj_obrnuto()
-	{
+	void sortiraj_obrnuto() {
 		sortiraj_ruku();
 		std::reverse(ruka.begin(),ruka.end());	
 	}
 
-
-	void ispis_ruke()
-	{
-		for(std::vector<kar::Karta>::iterator it=ruka.begin();it<ruka.end();it++)
-			it->toString();
+	//Metod koji "ispisuje" karte u ruci igraca
+	std::string ispis_ruke() {
+		ostringstream buffer;
+		
+		buffer << "[ ";
+		for(std::vector<kar::Karta>::iterator it=ruka.begin();it<ruka.end();it++) {
+			buffer << it->toString() << " ";
+		}
+		buffer << "]";
+		
+		return buffer.str();
 	}
 
-
-	int broj_poena_u_ruci()
-	{
+	//Metod koji vraca broj poena u ruci
+	int broj_poena_u_ruci() {
 		int poeni=0;
 		std::vector<kar::Karta>:: iterator it=ruka.begin();
 		for(;it<ruka.end();it++)
-		 poeni+=it->Vrednost();
+		 poeni+=it->get_vrednost();
 		return poeni;
 	}
 
-
-	void set_broj_poena(int broj)
-	{
-		_broj_bodova=broj;
+	/*
+	void set_broj_poena(int broj) {
+		_broj_poena=broj;
 	}
-
+	*/
+	
+	//Metod koji dodaje osvojene poene na ukupne poene igraca
+	void dodaj_poene(int broj_poena) {
+		_broj_poena += broj_poena;
+	}
 
 private:
 	std::vector<kar::Karta> ruka;
-	int _broj_bodova;
+	int _broj_poena;
 };
 
 
