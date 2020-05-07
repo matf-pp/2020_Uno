@@ -5,14 +5,17 @@
 #include "spil.h"
 #include <algorithm>
 #include <sstream>
+#include <string>
 
-namespace Ig{
+namespace Ig {
 
-class Igrac{
+class Igrac {
 public:
-	Igrac() {
-
-	}	
+	//Konstruktor
+	Igrac(const std::string &ime) {
+		_ime = ime;
+		_broj_poena = 0;
+	}
 
 	//Metod koji postavlja kartu u ruku igraca
 	void vuci(kar::Karta k) {
@@ -34,6 +37,10 @@ public:
 	//Metod koji vraca broj karata u ruci
 	int broj_karata() {
 		return ruka.size(); 
+	}
+	
+	void izbaci_sve_karte() {
+		ruka.clear();
 	}
 
 	//Metodi za sortiranje karata u ruci
@@ -67,6 +74,11 @@ public:
 		 poeni+=it->get_vrednost();
 		return poeni;
 	}
+	
+	//Getter:
+	int get_broj_poena() {
+		return _broj_poena;
+	}
 
 	/*
 	void set_broj_poena(int broj) {
@@ -78,12 +90,23 @@ public:
 	void dodaj_poene(int broj_poena) {
 		_broj_poena += broj_poena;
 	}
+	
+	//toString
+	std::string toString() const {
+		ostringstream buffer;
+		buffer << "[";
+		buffer << _ime;
+		buffer << "]";
+		
+		return buffer.str();
+	}
 
 private:
+	std::string _ime;
 	std::vector<kar::Karta> ruka;
 	int _broj_poena;
 };
 
-
 }
+
 #endif
