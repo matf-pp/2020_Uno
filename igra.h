@@ -42,6 +42,8 @@ public:
 	void odigraj_partiju() {
 		pripremi_sledecu_partiju();
 		
+		//_log<<_spil_za_igru.toString();
+		
 		ispisi_spil_za_izbacivanje();
 		
 		bool partija_zavrsena = false;
