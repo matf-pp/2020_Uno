@@ -20,10 +20,10 @@ public:
 	//Metod koji postavlja kartu u ruku igraca
 	void vuci(kar::Karta k) {
 		ruka.push_back(k);
-	}	
+	}
 
 	/*Metod koji iz ruke igraca izbacuje jednu kartu
-	 *Poziv simulira odvajanje jedne karte iz ruke kako bi se razmotrilo
+	 *Poziv simulira izdvajanje jedne karte iz ruke kako bi se razmotrilo
 	 *njeno eventualno izbacivanje.
 	 */
 	kar::Karta izbaci(int i) {
@@ -33,12 +33,46 @@ public:
 		ruka.pop_back();
 		return tmp;
 	}
+	
+	//TODO: Na osnovu "strategije" ili cega god, izbaci neku kartu iz ruke. =D
+	//P.S. ako je moguce, naravno (metod se ne poziva bez provere putem ima_sta_da_odigra)
+	kar::Karta izbaci_kartu(const kar::Karta &karta_na_talonu) {
+		for(int i = 0; i < (int)ruka.size(); i++) {
+			if(ruka[i].get_boja() == "Crna") {
+				return ruka[i];
+			}
+			if(ruka[i] == karta_na_talonu) {
+				return ruka[i];
+			}
+		}
+		return ruka[0];
+	}
+	
+	//TODO: Predstavlja to da li igrac ima, odn. *zeli* da izbaci neku kartu
+	bool ima_sta_da_odigra(const kar::Karta &karta_na_talonu) {
+		bool ind = false;
+		
+		std::vector<kar::Karta>::iterator karta;
+		for(karta = ruka.begin(); karta != ruka.end(); karta++) {
+			if(karta->get_boja() == "Crna") {
+				ind = true;
+				break;
+			}
+			if(*karta == karta_na_talonu) {
+				ind = true;
+				break;
+			}
+		}
+		
+		return ind;
+	}
 
 	//Metod koji vraca broj karata u ruci
 	int broj_karata() {
 		return ruka.size(); 
 	}
 	
+	//Metod kojim praznimo ruku igraca
 	void izbaci_sve_karte() {
 		ruka.clear();
 	}
@@ -87,7 +121,7 @@ public:
 	*/
 	
 	//Metod koji dodaje osvojene poene na ukupne poene igraca
-	void dodaj_poene(int broj_poena) {
+	void dodaj_poene(const int &broj_poena) {
 		_broj_poena += broj_poena;
 	}
 	

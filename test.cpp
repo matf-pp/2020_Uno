@@ -17,8 +17,8 @@ int main() {
 	
 	igra::Igra partija = igra::Igra(igraci);
 	
-	//partija.odigraj_partiju();
-	partija.odigraj();
+	partija.odigraj_partiju();
+	//partija.odigraj();
 	
 	return 0;
 }

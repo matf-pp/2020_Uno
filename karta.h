@@ -72,6 +72,10 @@ public:
 		_vrednost=k._vrednost;	
 	}
 	
+	void set_boja(const std::string &boja) {
+		_boja = boja;
+	}
+	
 	//toString
 	const string toString() const {
 		ostringstream buffer;
