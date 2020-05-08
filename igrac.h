@@ -28,24 +28,34 @@ public:
 	 */
 	kar::Karta izbaci(int i) {
 		kar::Karta tmp(ruka[i]);
+		
+		ruka.erase(ruka.begin() + i);
+		
+		/*
 		std::vector<kar::Karta>::iterator it=ruka.end();
 		ruka[i]=*(it-1);
 		ruka.pop_back();
+		*/
+		
 		return tmp;
 	}
 	
 	//TODO: Na osnovu "strategije" ili cega god, izbaci neku kartu iz ruke. =D
 	//P.S. ako je moguce, naravno (metod se ne poziva bez provere putem ima_sta_da_odigra)
 	kar::Karta izbaci_kartu(const kar::Karta &karta_na_talonu) {
+		kar::Karta karta_koju_izbacuje = kar::Karta();
+		
 		for(int i = 0; i < (int)ruka.size(); i++) {
 			if(ruka[i].get_boja() == "Crna") {
-				return ruka[i];
+				karta_koju_izbacuje.set_kar(izbaci(i));
+				break;
 			}
 			if(ruka[i] == karta_na_talonu) {
-				return ruka[i];
+				karta_koju_izbacuje.set_kar(izbaci(i));
+				break;
 			}
 		}
-		return ruka[0];
+		return karta_koju_izbacuje;
 	}
 	
 	//TODO: Predstavlja to da li igrac ima, odn. *zeli* da izbaci neku kartu

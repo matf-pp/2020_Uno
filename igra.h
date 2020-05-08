@@ -47,7 +47,7 @@ public:
 		bool partija_zavrsena = false;
 		while(!partija_zavrsena) {
 			//ispisi_spil_za_izbacivanje();		
-			//ispisi_stanje();
+			ispisi_stanje();
 			
 			//Provera da li je spil prazan
 			proveri_spil();
@@ -80,50 +80,42 @@ public:
 	 *Zato ovo ne racunamo kao etapu igranja poteza.
  	 */
 	bool odigraj_potez(int indeks) {
-		/*TODO:
-		ostringstream buffer;
-		bool igrac_bacio_kartu = false;
-		bool igrac_ima_sta_da_odigra = false;
 		kar::Karta odigrana_karta = kar::Karta();
+		bool igrac_ima_sta_da_odigra = false;
+		bool igrac_bacio_kartu = false;
+		ostringstream buffer;
 		
 		igrac_ima_sta_da_odigra = _igraci[indeks].ima_sta_da_odigra(_karta_na_talonu);
 		if(igrac_ima_sta_da_odigra) {
-			odigrana_karta.set_kar(_igraci[indeks].izbaci_kartu(_karta_na_talonu));
+			buffer << "IMA\n";//TODO: obrisati
 			
-			buffer << "IMA ";
-			buffer << odigrana_karta.toString() << "\n";
+			odigrana_karta = _igraci[indeks].izbaci_kartu(_karta_na_talonu);
 			
 			_spil_za_izbacivanje.push_back(odigrana_karta);
-			_karta_na_talonu.set_kar(odigrana_karta);
+			_karta_na_talonu = odigrana_karta;
 			
 			buffer << _igraci[indeks].toString() << " baca kartu ";
 			buffer << _karta_na_talonu.toString() << ".\n";
-			igrac_bacio_kartu = true;	
-			
-			//buffer << _igraci[indeks].toString() << " baca kartu ";
-			//buffer << _karta_na_talonu.toString() << ".\n";
+			igrac_bacio_kartu = true;
 		} else {
+			buffer << "NEMA\n";//TODO: obrisati
 			
-			_log << "NEMA\n";
-			
-			//Igrac vuce kartu
-			kar::Karta izvucena_karta(_spil_za_igru.izvuci_kartu());
+			kar::Karta izvucena_karta = kar::Karta(_spil_za_igru.izvuci_kartu());
 			buffer << _igraci[indeks].toString() << " vuce kartu " << izvucena_karta.toString();
 			
 			if(bacanje_dozvoljeno(izvucena_karta)) {
 				_spil_za_izbacivanje.push_back(izvucena_karta);
 				_karta_na_talonu = izvucena_karta;
 				
-				odigrana_karta.set_kar(izvucena_karta);
+				odigrana_karta = izvucena_karta;
+				
 				buffer << " i izbacuje je.\n";
 				igrac_bacio_kartu = true;
-			}
-			else {
-				_igraci[indeks].vuci(izvucena_karta);				
+			} else {
+				_igraci[indeks].vuci(izvucena_karta);
 				buffer << ".\n";
 			}
 		}
-		
 		_log << buffer.str();
 		
 		if(igrac_bacio_kartu) {
@@ -131,61 +123,6 @@ public:
 		} else {
 			odredi_sledeceg_igraca(0);
 		}
-		*/
-		
-		//Prolazi se kroz ruku u potrazi za upotrebljivom kartom
-		kar::Karta tmp(_igraci[indeks].izbaci(0));
-		int j = 0;				
-		while(!bacanje_dozvoljeno(tmp) && j < _igraci[indeks].broj_karata()) {
-			_igraci[indeks].vuci(tmp);
-			tmp.set_kar(_igraci[indeks].izbaci(0));
-			j++;
-		}
-		
-		/*Obrada: da li je pronadjena upotrebljiva karta?
-		 *Ukoliko jeste, igrac je odigra.
-		 *Ukoliko nije, igrac vuce.
-		 * -ako ni izvucena karta ne moze da se odigra, igrac je zavrsio potez.
-		 * -ako moze, igrac je odigra.
-		 */
-		bool igrac_bacio_kartu = false;
-		ostringstream buffer;
-		if(j == _igraci[indeks].broj_karata() && j != 0) {
-			
-			tmp.set_kar(_spil_za_igru.izvuci_kartu());				
-			buffer << _igraci[indeks].toString() << " vuce kartu " << tmp.toString();
-			
-			if(bacanje_dozvoljeno(tmp)) {
-				_spil_za_izbacivanje.push_back(tmp);
-				_karta_na_talonu = tmp;
-				
-				buffer << " i izbacuje je.\n";
-				igrac_bacio_kartu = true;
-			}
-			else {
-				_igraci[indeks].vuci(tmp);				
-				buffer << ".\n";
-			}				
-		} else {
-			
-			_spil_za_izbacivanje.push_back(tmp);
-			_karta_na_talonu = tmp;
-			
-			buffer << _igraci[indeks].toString() << " baca kartu ";
-			buffer << _karta_na_talonu.toString() << ".\n";
-			igrac_bacio_kartu = true;				
-			
-		}
-		
-		_log << buffer.str();
-		
-		
-		if(igrac_bacio_kartu) {
-			izvrsi_efekat_karte(tmp);
-		} else {
-			odredi_sledeceg_igraca(0);
-		}
-		
 
 		//Obrada: ako je igrac izbacio sve karte iz ruke, on je pobedio partiju.
 		if(_igraci[indeks].broj_karata() == 0) {
@@ -199,7 +136,7 @@ public:
 			
 			ispisi_pobednika_partije(indeks, poeni);
 			ispisi_stanje();
-			ispisi_rezultat();
+			ispisi_rezultat_partije();
 			
 			return true;		
 		}
@@ -210,19 +147,7 @@ public:
 		return false;
 	}
 	
-	/*TODO: obrisati
-	bool bacanje_dozvoljeno(const kar::Karta karta) {
-		if(karta.get_boja() == "Crna" || _karta_na_talonu.get_boja() == "Crna") {
-			return true;
-		}
-		if(karta == _karta_na_talonu) {
-			return true;
-		}
-		return false;
-	}
-	 */
-	
-	//Metoda provera da li data karta moze da se baci na spil za izbacivanje
+	//Metoda proverava da li data karta moze da se baci na spil za izbacivanje
 	bool bacanje_dozvoljeno(const kar::Karta &karta) {
 		if(karta.get_boja() == "Crna") {
 			return true;
@@ -270,7 +195,6 @@ public:
 		}
 		
 		//Ispisujemo stanje na pocetku partije
-		//_log << "Igraci na pocetku partije imaju sledece karte:\n";
 		ispisi_stanje();
 		
 		//Praznimo spil za izbacivanje
@@ -310,26 +234,30 @@ public:
 		std::string znak = odigrana_karta.get_znak();
 		if(znak == "Reverse") {
 			_smer_igranja *= -1;
-			odredi_sledeceg_igraca(0);
 		} else if(znak == "Block") {
-			odredi_sledeceg_igraca(1);
+			odredi_sledeceg_igraca(0);
+			_log << _igraci[_indeks_igraca_na_potezu].toString() << " preskace potez.\n";
 		} else if(znak == "+2") {
 			odredi_sledeceg_igraca(0);
 			dodeli_karte_igracu_na_potezu(2);
-			odredi_sledeceg_igraca(0);
 		} else if(znak == "Joker") {
 			//TODO: Dodati da menja boju
+			_log << "Nova boja: ";
+			_log << "Crvena"; //TODO: Promeniti da bude boja koja treba.
+			_log << "\n";
 			_karta_na_talonu.set_boja("Crvena");
-			odredi_sledeceg_igraca(0);
 		} else if(znak == "+4") {
 			//TODO: Dodati da menja boju
+			_log << "Nova boja: ";
+			_log << "Crvena"; //TODO: Promeniti da bude boja koja treba.
+			_log << "\n";
 			_karta_na_talonu.set_boja("Crvena");
 			odredi_sledeceg_igraca(0);
 			dodeli_karte_igracu_na_potezu(4);
-			odredi_sledeceg_igraca(0);
 		} else {
-			odredi_sledeceg_igraca(0);
+			//odredi_sledeceg_igraca(0);
 		}
+		odredi_sledeceg_igraca(0);
 		//_log << "Sledeci igrac: " << _igraci[_indeks_igraca_na_potezu].toString() << "\n";
 	}
 	
@@ -353,7 +281,7 @@ public:
 		buffer_karte << "]";
 		buffer << _igraci[_indeks_igraca_na_potezu].toString() << " vuce karte: ";
 		buffer << buffer_karte.str();
-		buffer << "\n";
+		buffer << " i preskace potez.\n";
 		
 		_log << buffer.str();
 	}
@@ -434,7 +362,7 @@ private:
 	}
 	
 	//Metod koji u log upisuje trenutne rezultate igraca
-	void ispisi_rezultat() {
+	void ispisi_rezultat_partije() {
 		ostringstream buffer;
 		
 		buffer << "\n";
@@ -462,9 +390,8 @@ private:
 	//Redni broj koji se uvecava kad god se igra nova partija
 	int _redni_broj_partije;
 	
-	/*U ovaj log se ispisuju sve relevantne informacije tokom simulacije igranja partije.
-	 *Ideja je da se na kraju svake partije ovaj log "prazni" u cout, i tek tada dobijamo kompletan ispis.
-	 *Vrlo korisno za debagovanje.
+	/*U ovaj log se upisuju sve relevantne informacije tokom simulacije igranja partije.
+	 *Ideja je da se na kraju svake partije ovaj log prazni u cout, i tek tada dobijamo kompletan ispis.
 	 */
 	ostringstream _log;
 	
