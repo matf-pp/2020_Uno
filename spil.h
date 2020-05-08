@@ -24,20 +24,25 @@ public:
 				}
 				case 1: {
 					j=i%10;
+					if(j!=0){
 					kar::Karta k(std::string("Crvena"),std::to_string(j));
 					_spil.push_back(k);
+					}
 					break;	
 				}
 				case 2: {
+										
 					j=i%10;
 					kar::Karta k(std::string("Plava"),std::to_string(j));
 					_spil.push_back(k);
 					break;	
 				}
 				case 3: {
+					if(j!=0){
 					j=i%10;
 					kar::Karta k(std::string("Plava"),std::to_string(j));
 					_spil.push_back(k);
+					}
 					break;	
 				}
 				case 4: {
@@ -48,8 +53,10 @@ public:
 				}
 				case 5: {
 					j=i%10;
+					if(j!=0){
 					kar::Karta k(std::string("Zuta"),std::to_string(j));
 					_spil.push_back(k);
+					}
 					break;	
 				}
 				case 6: {
@@ -59,9 +66,11 @@ public:
 					break;	
 				}
 				case 7: {
+					if(j!=0){
 					j=i%10;
 					kar::	Karta k(std::string("Zelena"),std::to_string(j));
 					_spil.push_back(k);	
+					}					
 					break;			
 				}
 			}
@@ -161,12 +170,15 @@ public:
 	//Metod koji mesa spil
 	void promesaj()
 	{
-		std::srand(std::time(nullptr));
+	    std::random_device rd;
+	    std::mt19937 gen(rd());
+	    std::uniform_int_distribution<> dis(0,107);
+
 		int j;
 		kar::Karta* tmp=new kar::Karta();
 		for(int i=0;i<int(_spil.size());i++)
 		{
-			j=rand()%108;
+			j=dis(gen);
 			tmp->set_kar(_spil[j]);
 			_spil[j].set_kar(_spil[i]);
 			_spil[i].set_kar(*tmp);
