@@ -49,7 +49,7 @@ public:
 		bool partija_zavrsena = false;
 		while(!partija_zavrsena) {
 			//ispisi_spil_za_izbacivanje();		
-			ispisi_stanje();
+			//ispisi_stanje();
 			
 			//Provera da li je spil prazan
 			proveri_spil();
@@ -87,21 +87,26 @@ public:
 		bool igrac_bacio_kartu = false;
 		ostringstream buffer;
 		
+		std::string preferirana_boja("Zelena");
+		
 		igrac_ima_sta_da_odigra = _igraci[indeks].ima_sta_da_odigra(_karta_na_talonu);
 		if(igrac_ima_sta_da_odigra) {
-			buffer << "IMA\n";//TODO: obrisati
+			std::vector<int> broj_karata_ostalih_igraca;
+			for(int i = 0; i < _broj_igraca; i++) {
+				if(i != indeks) {
+					broj_karata_ostalih_igraca.push_back(_igraci[i].broj_karata());
+				}
+			}
 			
-			odigrana_karta = _igraci[indeks].izbaci_kartu(_karta_na_talonu);
+			odigrana_karta = _igraci[indeks].izbaci_kartu(_karta_na_talonu, broj_karata_ostalih_igraca, preferirana_boja);
 			
 			_spil_za_izbacivanje.push_back(odigrana_karta);
 			_karta_na_talonu = odigrana_karta;
+			igrac_bacio_kartu = true;
 			
 			buffer << _igraci[indeks].toString() << " baca kartu ";
 			buffer << _karta_na_talonu.toString() << ".\n";
-			igrac_bacio_kartu = true;
 		} else {
-			buffer << "NEMA\n";//TODO: obrisati
-			
 			kar::Karta izvucena_karta = kar::Karta(_spil_za_igru.izvuci_kartu());
 			buffer << _igraci[indeks].toString() << " vuce kartu " << izvucena_karta.toString();
 			
@@ -121,7 +126,7 @@ public:
 		_log << buffer.str();
 		
 		if(igrac_bacio_kartu) {
-			izvrsi_efekat_karte(odigrana_karta);
+			izvrsi_efekat_karte(odigrana_karta, preferirana_boja);
 		} else {
 			odredi_sledeceg_igraca(0);
 		}
@@ -231,7 +236,7 @@ public:
 	}
 	
 	//Metod koji izvrsava efekat karte manipulacijom indeksa trenutnog igraca, kao i smera igranja
-	void izvrsi_efekat_karte(const kar::Karta &odigrana_karta) {
+	void izvrsi_efekat_karte(const kar::Karta &odigrana_karta, const std::string &nova_boja) {
 		//std::string boja = odigrana_karta.get_boja();
 		std::string znak = odigrana_karta.get_znak();
 		if(znak == "Reverse") {
@@ -245,15 +250,15 @@ public:
 		} else if(znak == "Joker") {
 			//TODO: Dodati da menja boju
 			_log << "Nova boja: ";
-			_log << "Crvena"; //TODO: Promeniti da bude boja koja treba.
+			_log << nova_boja;
 			_log << "\n";
-			_karta_na_talonu.set_boja("Crvena");
+			_karta_na_talonu.set_boja(nova_boja);
 		} else if(znak == "+4") {
 			//TODO: Dodati da menja boju
 			_log << "Nova boja: ";
-			_log << "Crvena"; //TODO: Promeniti da bude boja koja treba.
+			_log << nova_boja;
 			_log << "\n";
-			_karta_na_talonu.set_boja("Crvena");
+			_karta_na_talonu.set_boja(nova_boja);
 			odredi_sledeceg_igraca(0);
 			dodeli_karte_igracu_na_potezu(4);
 		} else {
@@ -261,12 +266,6 @@ public:
 		}
 		odredi_sledeceg_igraca(0);
 		//_log << "Sledeci igrac: " << _igraci[_indeks_igraca_na_potezu].toString() << "\n";
-	}
-	
-	//TODO
-	void izvrsi_efekat_karte(const kar::Karta &odigrana_karta, const std::string &nova_boja) {
-		izvrsi_efekat_karte(odigrana_karta);
-		_karta_na_talonu.set_boja(nova_boja);
 	}
 	
 	//Metod koji simulira efekte izvlacenja karata kod "+2" i "+4" karata.
