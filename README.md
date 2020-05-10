@@ -8,13 +8,16 @@
 **Kratak opis teme:** Simulacija igre Uno između četiri igrača.
 
 
-**Planirani jezik:** C++
+**Jezik:** C++
 
 
-**Pokretanje:** Kod se kompilira C++ kompilatorom g++. Izvršni fajl se pokreće iz terminala.
+**Potrebni alati za pokretanje:** C++ kompilator g++
 
 
-**Operativni sistem:** Linux / Windows
+**Način prevođenja i pokretanja:** Kod se prevodi C++ kompilatorom g++. Izvršni fajl se pokreće iz terminala.
+
+
+**Operativni sistem:** Linux
 
 
 **Autori:**
