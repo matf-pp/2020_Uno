@@ -38,8 +38,8 @@ public:
 					break;	
 				}
 				case 3: {
+					if(j!=0){
 					j=i%10;
-					if(j!=0){	
 					kar::Karta k(std::string("Plava"),std::to_string(j));
 					_spil.push_back(k);
 					}
@@ -65,9 +65,9 @@ public:
 					_spil.push_back(k);
 					break;	
 				}
-				case 7: {					
-					j=i%10;
+				case 7: {
 					if(j!=0){
+					j=i%10;
 					kar::	Karta k(std::string("Zelena"),std::to_string(j));
 					_spil.push_back(k);	
 					}					
