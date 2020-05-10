@@ -2,7 +2,6 @@
 #define KARTA_H
 
 #include <bits/stdc++.h>
-
 #include <string>
 #include <cctype>
 #include <cstdlib>
@@ -19,24 +18,23 @@ public:
 	Karta() {
 		_boja=std::string("");
 		_znak=std::string("");
-		_vrednost=0;
+		_vrednost = 0;
 	}
 	
-	Karta(std::string boja,std::string znak) {
-		_boja=boja;
-		_znak=znak;
-		_vrednost=Vrednost();
+	Karta(std::string boja, std::string znak) {
+		_boja = boja;
+		_znak = znak;
+		_vrednost = Vrednost();
 	}
 
 	Karta(const Karta &k) {	
-		_boja=k._boja;
-		_znak=k._znak;
-		_vrednost=k._vrednost;
-
+		_boja = k._boja;
+		_znak = k._znak;
+		_vrednost = k._vrednost;
 	}
 	
 	//Pomocna funkcija za odredjivanje vrednosti karte unutar konstruktora.
-	int Vrednost() {
+	int Vrednost() const {
 		if(isdigit(_znak[0])) {
 			return atoi(&_znak[0]);
 		}
@@ -66,7 +64,7 @@ public:
 		_vrednost=Vrednost();	
 	}
 	
-	void set_kar( Karta k) {
+	void set_karta(Karta k) {
 		_boja=k._boja;
 		_znak=k._znak;
 		_vrednost=k._vrednost;	
@@ -85,7 +83,7 @@ public:
 	
 	//Operator za poredjenje karata
 	bool operator == (const Karta &k) const {
-		if(_boja==k._boja || _znak==k._znak || _boja==std::string("Crna") || k._boja==std::string("Crna")) {
+		if(_boja == k._boja || _znak == k._znak || _boja == std::string("Crna") || k._boja == std::string("Crna")) {
 			return true;
 		}
 		return false;
@@ -97,8 +95,8 @@ private:
 };
 
 //Funkcija za poredjenje karata (po njihovoj vrednosi)
-bool compare(Karta k1 ,Karta k2) {
-	return k1.Vrednost()<k2.Vrednost();
+bool compare(Karta k1, Karta k2) {
+	return k1.Vrednost() < k2.Vrednost();
 }
 
 }
