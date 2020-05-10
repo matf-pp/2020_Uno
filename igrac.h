@@ -366,16 +366,14 @@ public:
 		return poeni;
 	}
 	
-	//Getter:
+	//Getteri:
 	int get_broj_poena() {
 		return _broj_poena;
 	}
-
-	/*
-	void set_broj_poena(int broj) {
-		_broj_poena=broj;
+	
+	std::string get_ime() {
+		return _ime;
 	}
-	*/
 	
 	//Metod koji dodaje osvojene poene na ukupne poene igraca
 	void dodaj_poene(const int &broj_poena) {
@@ -397,6 +395,10 @@ private:
 	std::vector<kar::Karta> ruka;
 	int _broj_poena;
 };
+
+bool compare(Ig::Igrac igrac1, Ig::Igrac igrac2) {
+	return igrac1.get_broj_poena() < igrac2.get_broj_poena();
+}
 
 }
 

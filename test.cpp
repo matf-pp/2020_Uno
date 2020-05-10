@@ -1,24 +1,14 @@
-#include "karta.h"
-#include "spil.h"
 #include "igra.h"
 #include <iostream>
 #include <vector>
-#include <iterator>
-
-using namespace std;
 
 int main() {
-	Ig::Igrac igrac1 = Ig::Igrac("Petar");
-	Ig::Igrac igrac2 = Ig::Igrac("Dubravka");
-	Ig::Igrac igrac3 = Ig::Igrac("Dobrivoje");
-	Ig::Igrac igrac4 = Ig::Igrac("Momir");
-	
-	std::vector<Ig::Igrac> igraci = {igrac1, igrac2, igrac3, igrac4};
-	
-	igra::Igra partija = igra::Igra(igraci);
-	
-	//partija.odigraj_partiju();
-	partija.odigraj();
+	std::vector<std::string> imena_igraca;
+	igra::ispisi_uvodnu_poruku(imena_igraca);
+
+	igra::Igra simulacija = igra::Igra(imena_igraca);
+	simulacija.odigraj();
+	//simulacija.odigraj_partiju();
 	
 	return 0;
 }

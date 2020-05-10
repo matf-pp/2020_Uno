@@ -13,15 +13,17 @@ namespace igra {
 
 class Igra {
 public:
-	//Konstruktor
-	Igra(std::vector<Ig::Igrac> &igraci) {
+	Igra(std::vector<std::string> &imena_igraca) {
 		//Postavljamo inicijalni broj partije, kao i smer igranja
 		_redni_broj_partije = 0;
 		_smer_igranja = 1;
 		
 		//Obradjujemo podatke o igracima
-		_igraci = igraci;
-		_broj_igraca = igraci.size();
+		_broj_igraca = imena_igraca.size();
+		for(int i = 0; i < _broj_igraca; i++) {
+			Ig::Igrac igrac = Ig::Igrac(imena_igraca[i]);
+			_igraci.push_back(igrac);
+		}
 		
 		//Pravimo i mesamo spil
 		_spil_za_igru=*(new spil::Spil());
@@ -36,6 +38,8 @@ public:
 			odigraj_partiju();
 			igra_zavrsena = nadjen_pobednik();
 		}
+		
+		ispisi_zavrsnu_poruku(_igraci);
 	}
 
 	//Metoda kojom se pokrece jedna partija
@@ -43,8 +47,7 @@ public:
 		pripremi_sledecu_partiju();
 		
 		//_log<<_spil_za_igru.toString();
-		
-		ispisi_spil_za_izbacivanje();
+		//ispisi_spil_za_izbacivanje();
 		
 		bool partija_zavrsena = false;
 		while(!partija_zavrsena) {
@@ -56,8 +59,16 @@ public:
 			
 			_log << "\n";
 			if(odigraj_potez(_indeks_igraca_na_potezu)) {
-				ispisi_spil_za_izbacivanje();
-				_log << "\n**********Kraj partije**********\n\n";
+				//ispisi_spil_za_izbacivanje();
+				
+				ostringstream buffer;
+				buffer << "\n";
+				buffer << "---------------------------------------------------------------\n";
+				buffer << "                          KRAJ PARTIJE                         \n";
+				buffer << "---------------------------------------------------------------\n";
+				
+				_log << buffer.str();
+				
 				partija_zavrsena = true;
 				break;
 			}
@@ -167,10 +178,21 @@ public:
 	
 	//Metoda koja sluzi da na pocetku partije resetuje i uredi podatke u klasi
 	void pripremi_sledecu_partiju() {
-		//Uvecavamo redni broj partije i zapocinjemo novi log
+		//Uvecavamo redni broj partije
 		_redni_broj_partije++;
+		
+		//Zapocinjemo novi log
 		_log.str("");
-		_log << "************Partija " << _redni_broj_partije << "***********\n";
+		
+		ostringstream buffer;
+		buffer << "---------------------------------------------------------------\n";
+		buffer << "                           ";
+		buffer << "PARTIJA " << _redni_broj_partije;
+		buffer << "                           ";
+		buffer << "\n";
+		buffer << "---------------------------------------------------------------\n";
+		
+		_log << buffer.str();
 		
 		//Pocinjemo od prvog igraca u nizu
 		//TODO: Napraviti tako da se pocinje od onog koji je pobedio u prethodnoj partiji
@@ -274,6 +296,7 @@ public:
 		
 		buffer_karte << "[ ";
 		for(int i = 0; i < broj_karata; i++) {
+			proveri_spil();
 			kar::Karta tmp(_spil_za_igru.izvuci_kartu());
 			_igraci[_indeks_igraca_na_potezu].vuci(tmp);
 			//_log << _igraci[_indeks_igraca_na_potezu].toString() << " vuce: " << tmp.toString();
@@ -289,7 +312,9 @@ public:
 	
 	//Metod proverava da li je spil prazan i, ako jeste, vraca sve karte sa talona u spil i mesa ga
 	void proveri_spil() {
+		//std::cout << _spil_za_igru.broj_karata_u_spilu() << "\n";
 		if(_spil_za_igru.broj_karata_u_spilu() == 0) {
+			_log << "u  if-u\n";
 			kar::Karta tmp(_spil_za_igru.set_spil(_spil_za_izbacivanje));
 			_spil_za_izbacivanje.push_back(tmp);
 		}
@@ -367,7 +392,7 @@ private:
 		ostringstream buffer;
 		
 		buffer << "\n";
-		buffer << "Ukupni brojevi poena:\n";
+		buffer << "Ukupni poeni:\n";
 		
 		std::vector<Ig::Igrac>::iterator igrac;
 		for(igrac = _igraci.begin(); igrac != _igraci.end(); igrac++) {
@@ -378,6 +403,49 @@ private:
 		}
 		
 		_log << buffer.str();
+	}
+	
+	void ispisi_zavrsnu_poruku(std::vector<Ig::Igrac> igraci) {
+		ostringstream buffer;
+		std::sort(igraci.begin(), igraci.end(), Ig::compare);
+		
+		buffer << "\n";
+		buffer << "***************************************************************\n";
+		buffer << "*                          REZULTATI                          *\n";
+		buffer << "***************************************************************\n";
+		buffer << "*                                                             *\n";
+		buffer << "* Nasi takmicari su ostvarili sledece rezultate:              *\n";
+		
+		std::sort(igraci.begin(), igraci.end(), Ig::compare);
+		std::reverse(igraci.begin(), igraci.end());
+		
+		std::vector<Ig::Igrac>::iterator igrac;
+		std::string razmaci;
+		int broj_razmaka;
+		for(igrac = igraci.begin(); igrac != igraci.end(); igrac++) {
+			buffer << "* ";
+			buffer << igrac->get_ime();
+			buffer << " ";
+			buffer << to_string(igrac->get_broj_poena());
+			
+			broj_razmaka = 59 - igrac->get_ime().length() - to_string(igrac->get_broj_poena()).length();
+			razmaci = std::string(broj_razmaka, ' ');
+			buffer << razmaci;
+			buffer << "*";
+			buffer << "\n";
+		}
+		
+		buffer << "*                                                             *\n";
+		buffer << "* Pobednik turnira je: ";
+		buffer << igraci[0].get_ime();
+		buffer << "!";
+		broj_razmaka = 38 - igraci[0].get_ime().length();
+		razmaci = std::string(broj_razmaka, ' ');
+		buffer << razmaci;
+		buffer << "*\n";
+		buffer << "***************************************************************\n";
+		
+		std::cout << buffer.str();
 	}
 	
 	//Podaci o igracima
@@ -405,6 +473,35 @@ private:
 	//Karta na vrhu spila za izbacivanje
 	kar::Karta _karta_na_talonu;
 };
+
+void ispisi_uvodnu_poruku(std::vector<std::string> &imena_igraca) {
+	ostringstream buffer;
+	
+	buffer << "***************************************************************\n";
+	buffer << "*                         UNO! TURNIR                         *\n";
+	buffer << "***************************************************************\n";
+	buffer << "*                                                             *\n";
+	buffer << "* Dobrodosli! Prisustvujete takmicenju izmedju 4 Uno igraca!  *\n";
+	buffer << "* Unesite im imena da bismo poceli.                           *\n";
+	buffer << "* (ime igraca treba da bude u obliku jedne reci)              *\n";
+	buffer << "*                                                             *\n";
+	buffer << "***************************************************************\n";
+	std::cout << buffer.str();
+	
+	std::string info;
+	for(int i = 0; i < 4; i++) {
+		std::cout << ">> " << i+1 << ". " << "igrac: ";
+		std::cin >> info;
+		
+		while(info.length() > 15) {
+			std::cout << "[!] Molimo, unesite ime sa najvise 15 karaktera.\n";
+			std::cout << ">> " << i+1 << ". " << "igrac: ";
+			std::cin >> info;
+		}
+		
+		imena_igraca.push_back(info);
+	}
+}
 
 }
 
