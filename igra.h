@@ -26,6 +26,11 @@ public:
 		_redni_broj_partije = 0;
 		_smer_igranja = 1;
 		
+		//Postavljamo indikatore za kontrolu toka programa
+		_interakcije_preskocene = false;
+		_partija_preskocena = false;
+		_partija_preskocena_kompletno = false;
+		
 		//Obradjujemo podatke o igracima
 		_broj_igraca = imena_igraca.size();
 		for(int i = 0; i < _broj_igraca; i++) {
@@ -44,7 +49,12 @@ public:
 		
 		while(!igra_zavrsena) {
 			odigraj_partiju();
+			
 			igra_zavrsena = nadjen_pobednik();
+			
+			if(!_interakcije_preskocene && !igra_zavrsena) {
+				cekaj_unos();
+			}
 		}
 		
 		ispisi_zavrsnu_poruku(_igraci);
@@ -57,7 +67,7 @@ public:
 		//_log<<_spil_za_igru.toString();
 		//ispisi_spil_za_izbacivanje();
 		
-		ispisi_spil_za_izbacivanje();
+		ispisi_kartu_na_talonu();
 		
 		bool partija_zavrsena = false;
 		while(!partija_zavrsena) {
@@ -67,7 +77,7 @@ public:
 			//Provera da li je spil prazan
 			proveri_spil();
 			
-			_log << "\n";
+			//_log << "\n";
 			if(odigraj_potez(_indeks_igraca_na_potezu)) {
 				//ispisi_spil_za_izbacivanje();
 				
@@ -77,7 +87,11 @@ public:
 				buffer << "                          KRAJ PARTIJE                         \n";
 				buffer << "---------------------------------------------------------------\n";
 				
-				_log << buffer.str();
+				if(_interakcije_preskocene) {
+					_log << buffer.str();
+				} else {
+					std::cout << buffer.str();
+				}
 				
 				partija_zavrsena = true;
 				break;
@@ -109,6 +123,9 @@ public:
 		ostringstream buffer;
 		std::string preferirana_boja("Zelena");
 		
+		if(_interakcije_preskocene || _partija_preskocena) {
+			buffer << "\n";
+		}
 		
 		igrac_ima_sta_da_odigra = _igraci[indeks].ima_sta_da_odigra(_karta_na_talonu);
 		if(igrac_ima_sta_da_odigra) {
@@ -144,7 +161,11 @@ public:
 			}
 		}
 		
-		_log << buffer.str();
+		if(_interakcije_preskocene) {
+			_log << buffer.str();
+		} else {
+			std::cout << buffer.str();
+		}
 		
 		
 		if(igrac_bacio_kartu) {
@@ -173,6 +194,26 @@ public:
 		
 		ispisi_sledeceg_igraca();
 		ispisi_kartu_na_talonu();
+		
+		//Ukoliko nije preskoceno, od korisnika se ocekuje unos sa standardnog ulaza.
+		if(!_interakcije_preskocene && !_partija_preskocena) {
+			char c = getchar();
+			if(c != '\n') {
+				char r = getchar();
+				if(r != '\n') {
+					std::cout << "Greska: posle svakog poteza treba uneti ili novi red ili karakter 'q'\n";
+					exit(EXIT_FAILURE);
+				}
+				
+				if(c == 'q') {
+					std::cout << "Unesen karakter 'q'. Ostatak partije se automatski ispisuje.\n";
+					_partija_preskocena = true;
+				} else {
+					std::cout << "Greska: posle svakog poteza treba uneti ili novi red ili karakter 'q'\n";
+					exit(EXIT_FAILURE);
+				}
+			}
+		}
 		
 		return false;
 	}
@@ -204,7 +245,17 @@ public:
 		buffer << "\n";
 		buffer << "---------------------------------------------------------------\n";
 		
-		_log << buffer.str();
+		//Podesavamo indikatore za kontrolu toka programa
+		_partija_preskocena = false;
+		if(_partija_preskocena_kompletno) {
+			_partija_preskocena = true;
+		}
+		
+		if(_interakcije_preskocene) {
+			_log << buffer.str();
+		} else {
+			std::cout << buffer.str();
+		}
 		
 		//Pocinjemo od prvog igraca u nizu
 		_indeks_igraca_na_potezu = 0;
@@ -274,23 +325,33 @@ public:
 	//Metod koji izvrsava efekat karte manipulacijom indeksa trenutnog igraca, kao i smera igranja
 	void izvrsi_efekat_karte(const kar::Karta &odigrana_karta, const std::string &nova_boja) {
 		std::string znak = odigrana_karta.get_znak();
+		
+		std::string poruka = "";
+		ostringstream buffer;
+		
 		if(znak == "Reverse") {
 			_smer_igranja *= -1;
+			poruka = "Redosled igranja se obrce!\n";
 		} else if(znak == "Block") {
 			odredi_sledeceg_igraca(0);
-			_log << _igraci[_indeks_igraca_na_potezu].toString() << " preskace potez.\n";
+			buffer << _igraci[_indeks_igraca_na_potezu].toString() << " preskace potez.\n";
+			poruka = buffer.str();
 		} else if(znak == "+2") {
 			odredi_sledeceg_igraca(0);
 			dodeli_karte_igracu_na_potezu(2);
 		} else if(znak == "Joker") {
-			_log << "Nova boja: ";
-			_log << nova_boja;
-			_log << "\n";
+			buffer << "Nova boja: ";
+			buffer << nova_boja;
+			buffer << "\n";
+			poruka = buffer.str();
+			
 			_karta_na_talonu.set_boja(nova_boja);
 		} else if(znak == "+4") {
-			_log << "Nova boja: ";
-			_log << nova_boja;
-			_log << "\n";
+			buffer << "Nova boja: ";
+			buffer << nova_boja;
+			buffer << "\n";
+			poruka = buffer.str();
+			
 			_karta_na_talonu.set_boja(nova_boja);
 			
 			odredi_sledeceg_igraca(0);
@@ -299,6 +360,14 @@ public:
 			//odredi_sledeceg_igraca(0);
 		}
 		odredi_sledeceg_igraca(0);
+		
+		if(!poruka.empty()) {
+			if(_interakcije_preskocene) {
+				_log << poruka;
+			} else {
+				std::cout << poruka;
+			}
+		}
 		//_log << "Sledeci igrac: " << _igraci[_indeks_igraca_na_potezu].toString() << "\n";
 	}
 	
@@ -306,27 +375,30 @@ public:
 	void dodeli_karte_igracu_na_potezu(int broj_karata) {
 		ostringstream buffer, buffer_karte;
 		
-		buffer_karte << "[ ";
+		//buffer_karte << "[ ";
 		for(int i = 0; i < broj_karata; i++) {
 			proveri_spil();
 			kar::Karta tmp(_spil_za_igru.izvuci_kartu());
 			_igraci[_indeks_igraca_na_potezu].vuci(tmp);
 			//_log << _igraci[_indeks_igraca_na_potezu].toString() << " vuce: " << tmp.toString();
-			buffer_karte << tmp.toString() << " ";
+			buffer_karte << " " << tmp.toString();
 		}
-		buffer_karte << "]";
-		buffer << _igraci[_indeks_igraca_na_potezu].toString() << " vuce karte: ";
+		//buffer_karte << "]";
+		buffer << _igraci[_indeks_igraca_na_potezu].toString() << " vuce karte:";
 		buffer << buffer_karte.str();
 		buffer << " i preskace potez.\n";
-		buffer << "\n";
+		//buffer << "\n";
 		
-		_log << buffer.str();
+		if(_interakcije_preskocene) {
+			_log << buffer.str();
+		} else {
+			std::cout << buffer.str();
+		}
 	}
 	
 	//Metod proverava da li je spil prazan i, ako jeste, vraca sve karte sa talona u spil i mesa ga
 	void proveri_spil() {
 		if(_spil_za_igru.broj_karata_u_spilu() == 0) {
-			_log << "u  if-u\n";
 			kar::Karta tmp(_spil_za_igru.set_spil(_spil_za_izbacivanje));
 			_spil_za_izbacivanje.push_back(tmp);
 		}
@@ -347,7 +419,11 @@ private:
 			buffer << "\n";
 		}
 		
-		_log << buffer.str();
+		if(_interakcije_preskocene) {
+			_log << buffer.str();
+		} else {
+			std::cout << buffer.str();
+		}
 	}
 
 	//Metod koji u log upisuje podatke o spilu za izbacivanje karata
@@ -360,7 +436,11 @@ private:
 		spil::Spil* tmp = new spil::Spil(_spil_za_izbacivanje);
 		buffer << tmp->toString() << "\n";
 		
-		_log << buffer.str();
+		if(_interakcije_preskocene) {
+			_log << buffer.str();
+		} else {
+			std::cout << buffer.str();
+		}
 	}
 	
 	void ispisi_sledeceg_igraca() {
@@ -371,7 +451,11 @@ private:
 		buffer << _igraci[_indeks_igraca_na_potezu].toString(); 
 		buffer << "\n";
 		
-		_log << buffer.str();
+		if(_interakcije_preskocene) {
+			_log << buffer.str();
+		} else {
+			std::cout << buffer.str();
+		}
 	}
 	
 	void ispisi_kartu_na_talonu() {
@@ -382,7 +466,11 @@ private:
 		buffer << _karta_na_talonu.toString();
 		buffer << "\n";
 		
-		_log << buffer.str();
+		if(_interakcije_preskocene) {
+			_log << buffer.str();
+		} else {
+			std::cout << buffer.str();
+		}
 	}
 	
 	void ispisi_pobednika_partije(int indeks_pobednika, int broj_osvojenih_poena) {
@@ -396,7 +484,11 @@ private:
 		buffer << broj_osvojenih_poena;
 		buffer << "\n";
 		
-		_log << buffer.str();
+		if(_interakcije_preskocene) {
+			_log << buffer.str();
+		} else {
+			std::cout << buffer.str();
+		}
 	}
 	
 	//Metod koji u log upisuje trenutne rezultate igraca
@@ -414,9 +506,14 @@ private:
 			buffer << "\n";
 		}
 		
-		_log << buffer.str();
+		if(_interakcije_preskocene) {
+			_log << buffer.str();
+		} else {
+			std::cout << buffer.str();
+		}
 	}
 	
+	//Metod koji ispisuje zavrsnu poruku na kraju programa
 	void ispisi_zavrsnu_poruku(std::vector<Ig::Igrac> igraci) {
 		ostringstream buffer;
 		std::sort(igraci.begin(), igraci.end(), Ig::compare);
@@ -450,14 +547,66 @@ private:
 		buffer << "*                                                             *\n";
 		buffer << "* Pobednik turnira je: ";
 		buffer << igraci[0].get_ime();
-		buffer << "!";
-		broj_razmaka = 38 - igraci[0].get_ime().length();
+		buffer << "! Cestitamo!";
+		broj_razmaka = 27 - igraci[0].get_ime().length();
 		razmaci = std::string(broj_razmaka, ' ');
 		buffer << razmaci;
 		buffer << "*\n";
+		buffer << "*                                                             *\n";
 		buffer << "***************************************************************\n";
 		
 		std::cout << buffer.str();
+	}
+	
+	/*Metod koji od korisnika ocekuje da unese opciju koja odredjuje kako se nadalje izvrsava program
+	 */
+	void cekaj_unos() {
+		ostringstream buffer;
+		
+		buffer << "\n";
+		buffer << "Unesite karakter:\n";
+		buffer << "c - continue opcija\n";
+		buffer << "Biranjem ove opcije se naredna partija prati potez po potez.\n";
+		buffer << "s - skip opcija\n";
+		buffer << "Biranjem ove opcije se naredna partija preskace, odnosno ispisuje bez pracenja poteza.\n";
+		buffer << "q - quit opcija\n";
+		buffer << "Biranjem ove opcije se naredna i sve sledece partije preskacu, sve do kraja turnira.\n";
+		buffer << ">> ";
+		std::cout << buffer.str();
+		
+		std::string unos;
+		char uneseni_karakter;
+		
+		std::cin >> unos;
+		uneseni_karakter = unos[0];
+		
+		bool karakter_validan;
+		
+		karakter_validan = (uneseni_karakter == 'c');
+		karakter_validan = karakter_validan || (uneseni_karakter == 'q');
+		karakter_validan = karakter_validan || (uneseni_karakter == 's');
+		karakter_validan = karakter_validan && (unos.length() <= 2);
+		
+		while(!karakter_validan) {
+			std::cout << "[!] Molimo, unesite karakter 'c', 's' ili 'q'.\n";
+			std::cout << ">> ";
+			
+			std::cin >> unos;
+			uneseni_karakter = unos[0];
+			
+			karakter_validan = (uneseni_karakter == 'c');
+			karakter_validan = karakter_validan || (uneseni_karakter == 'q');
+			karakter_validan = karakter_validan || (uneseni_karakter == 's');
+			karakter_validan = karakter_validan && (unos.length() <= 2);
+		}
+		
+		if(uneseni_karakter == 'c') {
+			_partija_preskocena_kompletno = false;
+		} else if(uneseni_karakter == 'q') {
+			_interakcije_preskocene = true;
+		} else if(uneseni_karakter == 's') {
+			_partija_preskocena_kompletno = true;
+		}
 	}
 	
 	//Podaci o igracima
@@ -471,10 +620,16 @@ private:
 	//Redni broj koji se uvecava kad god se igra nova partija
 	int _redni_broj_partije;
 	
-	/*U ovaj log se upisuju sve relevantne informacije tokom simulacije igranja partije.
-	 *Ideja je da se na kraju svake partije ovaj log prazni u cout, i tek tada dobijamo kompletan ispis.
+	/* U ovaj log se upisuju sve relevantne informacije tokom simulacije igranja partije.
+	 * Ideja je da se na kraju partije ovaj log prazni u cout, i tek tada dobijamo kompletan ispis.
+	 * Ovo, doduse, vazi jedino ako korisnik nije ubrzao tok izvrsavanja programa na neki nacin.
 	 */
 	ostringstream _log;
+	
+	//Indikatori koji sluze da kontrolisu tok programa u zavisnosti od toga sta korisnik unosi
+	bool _interakcije_preskocene;
+	bool _partija_preskocena;
+	bool _partija_preskocena_kompletno;
 	
 	//Narednim podacima se manipulise pri igranju karata sa specijalnim efektima:
 	
@@ -513,6 +668,18 @@ void ispisi_uvodnu_poruku(std::vector<std::string> &imena_igraca) {
 		
 		imena_igraca.push_back(info);
 	}
+	getchar();
+	
+	buffer.str("");
+	buffer << "***************************************************************\n";
+	buffer << "*                                                             *\n";
+	buffer << "* Napomena: Tokom jedne partije, svaki igrac ce odigrati svoj *\n";
+	buffer << "* potez, nakon cega mozete uneti ENTER, ako zelite da dalje   *\n";
+	buffer << "* nastavite, ili karakter 'q' da biste preskocili do kraja    *\n";
+	buffer << "* tekuce partije.                                             *\n";
+	buffer << "*                                                             *\n";
+	buffer << "***************************************************************\n";
+	std::cout << buffer.str();
 }
 
 }
