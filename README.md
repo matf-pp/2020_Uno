@@ -8,7 +8,7 @@ UNO! je kartaška igra slična Mau Mau, sa posebno odštampanim kartama i specif
 
 *Koncept partije:* Kao što je već rečeno, igrači počinju sa po 6 karata u ruci. Svaki igrač ima svoj potez u kojem on može ali ne mora da odigra neku kartu. Kada igrač odigra neku kartu, on je izbacuje na talon, koga čini špil karata okrenutih nagore. Karta koja je na vrhu talona određuje koju kartu igrač može baciti u svom potezu. Postoji i špil za izvlačenje sa kog igrač vuče ako, recimo, nema šta da odigra u svom potezu. Karte imaju specijalne efekte koji drastično utiču na tok partije.
 
-*Karte:* UNO! karte su specifične i čine srž ove igre. Postoje 4 boje karata: crvena, žuta, zelena i plava. Karte koje su nekoj od tih boja mogu biti brojevi, "+2", "Skip" ili "Reverse" karte.
+*Karte:* UNO! karte su specifične i čine srž ove igre. Postoje 4 boje karata: crvena, žuta, zelena i plava. Karte koje su u nekoj od tih boja mogu biti brojevi, "+2", "Skip" ili "Reverse" karte.
 - Brojevi su karte obeležene nekom od cifara 0-9 i nemaju specijalan efekat.
 - Kada igrač odigra "+2" kartu, sledeći igrač preskače svoj potez i vuče dve karte.
 - Kada igrač odigra "Skip" kartu, sledeći igrač preskače svoj potez.
@@ -19,7 +19,7 @@ Postoje i tzv. *džokeri*: "Wild" i "Wild +4" karte. Ove karte su crne boje, i i
 - "Wild +4" karta ima isti efekat kao "Wild" karta, uz dodatan efekat da sledeći igrač vuče 4 karte i preskače potez.
 
 Sve karte imaju svoju vrednost u poenima koja odgovara jačini njihovog efekta:
-- Karta sa brojem vredi onoliko koliko iznosi taj broj (karta "3" vredi 3 poena).
+- Karta sa brojem vredi onoliko koliko iznosi taj broj (npr. karta "3" vredi 3 poena).
 - "+2", "Skip" i "Reverse" karte vrede 20 poena
 - "Wild" i "Wild +4" karte vrede 50 poena
 
@@ -59,7 +59,7 @@ Izvršni fajl se pokreće iz terminala:
 ### Operativni sistem
 Program je namenjen za izvršavanje na operativnom sistemu Ubuntu.
 
-### Autori:
+### Autori
 - Aleksa Trbović,  217/2017 aleksa.trbovic@gmail.com
 
 - Robert Doža,  33/2017 dozarobert98@gmail.com
