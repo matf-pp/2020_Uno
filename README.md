@@ -41,6 +41,8 @@ Strategije koje smo implementirali su sledeće:
 - Igrač će uvek posmatrati koliko karata u ruci imaju ostali igrači i regulisati svoj način igranja prema tome.
 - Igrač će analizirati koliko je i on sam blizu pobede, pa će odgovarajuće igrati.
 
+Ideja je da korisnik učestvuje kao posmatrač, odnosno on ne nije jedan od igrača, već posmatra uzastupne partije i ima pregled toka cele igre. Dakle, njegov uticaj na izvršavanje programa je minimalan.
+
 ### Programski jezik
 Projekat je napisan u celosti u programskom jeziku C++.
 
